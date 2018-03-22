@@ -15,12 +15,16 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 	private Ship ship;
 	private Alien alienOne;
 	private Alien alienTwo;
+	private long timer;
+	private int timing;
+	private boolean playerShots;
 
 	/* uncomment once you are ready for this part
 	 *
    private AlienHorde horde;
+   */
 	private Bullets shots;
-	*/
+
 
 	private boolean[] keys;
 	private BufferedImage back;
@@ -38,7 +42,15 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 		new Thread(this).start();
 
 		setVisible(true);
+		ship = new Ship(350,350,50,50,1);
+		alienOne = new Alien(200,200);
+		alienTwo = new Alien(200,200);
+		timer = System.currentTimeMillis();
+		timing = 0;
+		shots = new Bullets();
+		playerShots=true;
 	}
+
 
    public void update(Graphics window)
    {
@@ -50,7 +62,9 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 		//set up the double buffering to make the game animation nice and smooth
 		Graphics2D twoDGraph = (Graphics2D)window;
 
-		//take a snap shop of the current screen and same it as an image
+
+
+		//take a snap shop of the current screen and save it as an image
 		//that is the exact same width and height as the current screen
 		if(back==null)
 		   back = (BufferedImage)(createImage(getWidth(),getHeight()));
@@ -63,13 +77,44 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 		graphToBack.drawString("StarFighter ", 25, 50 );
 		graphToBack.setColor(Color.BLACK);
 		graphToBack.fillRect(0,0,800,600);
-
+		ship.draw(graphToBack);
+		alienOne.draw(graphToBack);
+		alienTwo.draw(graphToBack);
 		if(keys[0] == true)
 		{
 			ship.move("LEFT");
 		}
+		if(keys[1] == true)
+			ship.move("RIGHT");
+		if(keys[2] == true)
+			ship.move("UP");
+		if(keys[3] == true)
+			ship.move("DOWN");
+		if(keys[4]==true&&playerShots) {
+			shots.add(new Ammo(ship.getX(), ship.getY() + 25));
+			playerShots=false;
+		}
+		else if(keys[4]==false)
+			playerShots=true;
 
+		for(Ammo ammo:shots.getList())
+		{
+			ammo.move("UP");
+			ammo.draw(graphToBack);
+		}
+		timing = (int)(System.currentTimeMillis()-timer);
 		//add code to move Ship, Alien, etc.
+		if(timing>=1000)
+		{
+			timing = timing-1000;
+			timer = System.currentTimeMillis();
+			alienOne.move("DOWN");
+			alienTwo.move("DOWN");
+
+		}
+		int x = (int)(Math.sin(timing)*15);
+		alienOne.setX(getX()-x);
+		alienTwo.setX(getX()-x);
 
 
 		//add in collision detection to see if Bullets hit the Aliens and if Bullets hit the Ship

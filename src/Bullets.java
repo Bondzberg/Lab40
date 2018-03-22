@@ -12,10 +12,12 @@ public class Bullets
 
 	public Bullets()
 	{
+		ammo = new ArrayList<>();
 	}
 
 	public void add(Ammo al)
 	{
+		ammo.add(al);
 	}
 
 	//post - draw each Ammo
@@ -33,7 +35,7 @@ public class Bullets
 
 	public List<Ammo> getList()
 	{
-		return null;
+		return ammo;
 	}
 
 	public String toString()
