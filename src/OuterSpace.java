@@ -140,6 +140,7 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 		{
 			interpret(input);
 			input=null;
+			input =JOptionPane.showInputDialog("Enter Movement please");
 		}
 	}
 
@@ -157,28 +158,28 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 				{
 					int speed = ship.getSpeed();
 					ship.setSpeed(Integer.valueOf(strings[2]));
-					ship.move("up");
+					ship.move("UP");
 					ship.setSpeed(speed);
 				}
 				if(strings[1].equals("down"))
 				{
 					int speed = ship.getSpeed();
 					ship.setSpeed(Integer.valueOf(strings[2]));
-					ship.move("down");
+					ship.move("DOWN");
 					ship.setSpeed(speed);
 				}
 				if(strings[1].equals("left"))
 				{
 					int speed = ship.getSpeed();
 					ship.setSpeed(Integer.valueOf(strings[2]));
-					ship.move("left");
+					ship.move("LEFT");
 					ship.setSpeed(speed);
 				}
 				if(strings[1].equals("right"))
 				{
 					int speed = ship.getSpeed();
 					ship.setSpeed(Integer.valueOf(strings[2]));
-					ship.move("right");
+					ship.move("RIGHT");
 					ship.setSpeed(speed);
 				}
 				else{
@@ -192,7 +193,7 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 		{
 
 		}
-		input =JOptionPane.showInputDialog("Enter Movement please");
+
 	}
 
 	public void keyPressed(KeyEvent e)
@@ -250,9 +251,7 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
       //no code needed here
 	}
 
-	public void setTextField(TextField textField) {
-		this.textField = textField;
-	}
+
 
 	public void run()
    {
