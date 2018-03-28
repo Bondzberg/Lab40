@@ -1,3 +1,11 @@
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+
+import javax.swing.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -9,22 +17,21 @@ import static java.lang.Character.*;
 import java.awt.image.BufferedImage;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javafx.event.EventHandler;
 
 public class OuterSpace extends Canvas implements KeyListener, Runnable
 {
+
 	private Ship ship;
 	private Alien alienOne;
 	private Alien alienTwo;
-	private long timer;
-	private int timing;
 	private boolean playerShots;
 
-	/* uncomment once you are ready for this part
-	 *
-   private AlienHorde horde;
-   */
+    private AlienHorde horde;
 	private Bullets shots;
+	private int simple;
 
+	private String input;
 
 	private boolean[] keys;
 	private BufferedImage back;
@@ -40,15 +47,27 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 
 		this.addKeyListener(this);
 		new Thread(this).start();
-
+		horde = new AlienHorde(0);
 		setVisible(true);
 		ship = new Ship(350,350,50,50,1);
-		alienOne = new Alien(200,200);
-		alienTwo = new Alien(200,200);
-		timer = System.currentTimeMillis();
-		timing = 0;
+		alienOne = new Alien(200,100);
+		alienTwo = new Alien(300,100);
+		horde.add(alienOne);
+		horde.add(alienTwo);
+        horde.add(new Alien(300,0));
+        horde.add(new Alien(400,0));
+        horde.add(new Alien(500,0));
+        horde.add(new Alien(600,0));
+        horde.add(new Alien(700,0));
+        horde.add(new Alien(0,100));
+        horde.add(new Alien(400,0));
+        horde.add(new Alien(500,0));
+        horde.add(new Alien(700,0));
+        horde.add(new Alien(600,0));
 		shots = new Bullets();
 		playerShots=true;
+		simple = 120;
+		input =JOptionPane.showInputDialog("Enter Movement please");
 	}
 
 
@@ -59,6 +78,7 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 
 	public void paint( Graphics window )
 	{
+		simple++;
 		//set up the double buffering to make the game animation nice and smooth
 		Graphics2D twoDGraph = (Graphics2D)window;
 
@@ -78,8 +98,6 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 		graphToBack.setColor(Color.BLACK);
 		graphToBack.fillRect(0,0,800,600);
 		ship.draw(graphToBack);
-		alienOne.draw(graphToBack);
-		alienTwo.draw(graphToBack);
 		if(keys[0] == true)
 		{
 			ship.move("LEFT");
@@ -91,38 +109,91 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
 		if(keys[3] == true)
 			ship.move("DOWN");
 		if(keys[4]==true&&playerShots) {
-			shots.add(new Ammo(ship.getX(), ship.getY() + 25));
+			shots.add(new Ammo(ship.getX()+5, ship.getY()-5));
 			playerShots=false;
 		}
 		else if(keys[4]==false)
 			playerShots=true;
 
-		for(Ammo ammo:shots.getList())
-		{
-			ammo.move("UP");
-			ammo.draw(graphToBack);
-		}
-		timing = (int)(System.currentTimeMillis()-timer);
+		shots.moveEmAll();
+		shots.drawEmAll(graphToBack);
+		shots.cleanEmUp();
+
 		//add code to move Ship, Alien, etc.
-		if(timing>=1000)
+		if(simple%580==0)
 		{
-			timing = timing-1000;
-			timer = System.currentTimeMillis();
-			alienOne.move("DOWN");
-			alienTwo.move("DOWN");
-
+			horde.moveEmAll();
 		}
-		int x = (int)(Math.sin(timing)*15);
-		alienOne.setX(getX()-x);
-		alienTwo.setX(getX()-x);
-
+		int x = (int)((Math.sin(((2*Math.PI)/240)*(simple%240)))*2);
+		for(Alien alan:horde.getAliens())
+		{
+			alan.setX(alan.getX()+x);
+		}
+		horde.removeDeadOnes(shots.getList());
+		horde.drawEmAll(graphToBack);
 
 		//add in collision detection to see if Bullets hit the Aliens and if Bullets hit the Ship
 
 
 		twoDGraph.drawImage(back, null, 0, 0);
+		if(input!=null)
+		{
+			interpret(input);
+			input=null;
+		}
 	}
 
+	public void interpret(String s)
+	{
+		s = s.toLowerCase();
+		String[] strings = s.split(" ");
+		try{
+			if(strings[0].equals("fire"))
+			{
+				shots.add(new Ammo(ship.getX()+5, ship.getY()-5));
+			}
+			else if(strings[0].equals("move")){
+				if(strings[1].equals("up"))
+				{
+					int speed = ship.getSpeed();
+					ship.setSpeed(Integer.valueOf(strings[2]));
+					ship.move("up");
+					ship.setSpeed(speed);
+				}
+				if(strings[1].equals("down"))
+				{
+					int speed = ship.getSpeed();
+					ship.setSpeed(Integer.valueOf(strings[2]));
+					ship.move("down");
+					ship.setSpeed(speed);
+				}
+				if(strings[1].equals("left"))
+				{
+					int speed = ship.getSpeed();
+					ship.setSpeed(Integer.valueOf(strings[2]));
+					ship.move("left");
+					ship.setSpeed(speed);
+				}
+				if(strings[1].equals("right"))
+				{
+					int speed = ship.getSpeed();
+					ship.setSpeed(Integer.valueOf(strings[2]));
+					ship.move("right");
+					ship.setSpeed(speed);
+				}
+				else{
+
+				}
+			}
+			else{
+
+			}
+		}catch(Exception e)
+		{
+
+		}
+		input =JOptionPane.showInputDialog("Enter Movement please");
+	}
 
 	public void keyPressed(KeyEvent e)
 	{
@@ -179,7 +250,11 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
       //no code needed here
 	}
 
-   public void run()
+	public void setTextField(TextField textField) {
+		this.textField = textField;
+	}
+
+	public void run()
    {
    	try
    	{
@@ -192,5 +267,22 @@ public class OuterSpace extends Canvas implements KeyListener, Runnable
       {
       }
   	}
+
+  	public Boolean isIntersecting(Moveable x,Moveable y)
+	{
+		int x1 = x.getX();
+		int x2 = x.getX()+x.getWidth();
+		int y1 = x.getY();
+		int y2 = x.getY()+x.getHeight();
+		if(x1<=y.getX()&&y.getX()<=x2)
+			return true;
+		else if(y1<=y.getY()&&y.getY()<=y2)
+			return true;
+		else if(y1<=y.getY()+y.getHeight()&&y.getY()+y.getHeight()<=y2)
+			return true;
+		else if(x1<=y.getX()+y.getWidth()&&y.getX()+y.getWidth()<=x2)
+			return true;
+		return false;
+	}
 }
 

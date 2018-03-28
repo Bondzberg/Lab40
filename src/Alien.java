@@ -18,7 +18,7 @@ public class Alien extends MovingThing
 	public Alien(int x, int y)
 	{
 		//add code here
-		this(x,y,30,30,1);
+		this(x,y,30,30,10);
 	}
 
 	public Alien(int x, int y, int s)

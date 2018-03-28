@@ -1,3 +1,6 @@
+import javafx.application.Application;
+import javafx.stage.Stage;
+
 import javax.swing.JFrame;
 import java.awt.Component;
 
